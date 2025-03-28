@@ -1,0 +1,222 @@
+ 1) Applies filters, ordering, and pagination.
+
+  SELECT *
+        FROM (
+            SELECT *
+            FROM OPENROWSET(
+                BULK 'https://stgaccinmdhdevlrsf.dfs.core.windows.net/yasa/64ae50e5a4cd811344e380a2/yasaportal/6546c063dcbb137770ef938a/67bc5d80e85482ec211f5714_26-02-2025_07:11:03_AM.parquet',
+                FORMAT = 'PARQUET'
+            ) WITH ([_id] VARCHAR(MAX), [status] VARCHAR(MAX), [createdBy] VARCHAR(MAX), [createdDate] VARCHAR(MAX), [lastUpdatedDateTime] VARCHAR(MAX), [lastUpdatedBy] VARCHAR(MAX), [approval_status] VARCHAR(MAX), [approved_by] VARCHAR(MAX), [index] bigint, [column_changes] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 1_Text_1974659106943] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 2_Text_7556325638313] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 3_Text_1265532763677] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 4_Text_2597834633593] VARCHAR(MAX), [row_id] VARCHAR(MAX), [deletedBy] VARCHAR(MAX), [deletedOn] VARCHAR(MAX), [restored] VARCHAR(MAX), [modifiedRow_id] VARCHAR(MAX)) [result]
+            WHERE status = 'active'  AND approved_by = 'Suruthi S K' AND approval_status = 'approved' AND (
+                approval_status = 'approved'
+                 OR (
+                    approval_status = 'draft'
+                    AND CAST(createdBy AS VARCHAR) = ''
+                    AND (deletedBy IS NULL OR deletedBy = '')
+                )
+                OR (
+                    approval_status = 'draft'
+                    AND CAST(deletedBy AS VARCHAR)!= ''
+                    AND deletedBy IS NOT NULL
+                )
+                OR approval_status = 'submitted'
+            )
+            ORDER BY TRY_CAST(REPLACE(_id, '.', '') AS BIGINT)
+            OFFSET 0 ROWS
+            FETCH NEXT 10000 ROWS ONLY
+        ) AS sub
+		
+
+
+2)Applying filters, sorting, and pagination.
+
+SELECT *
+        FROM (
+            SELECT *
+            FROM OPENROWSET(
+                BULK 'https://stgaccinmdhdevlrsf.dfs.core.windows.net/yasa/64ae50e5a4cd811344e380a2/yasaportal/6546c063dcbb137770ef938a/67bc5d80e85482ec211f5714_26-02-2025_07:11:03_AM.parquet',
+                FORMAT = 'PARQUET'
+            ) WITH ([_id] VARCHAR(MAX), [status] VARCHAR(MAX), [createdBy] VARCHAR(MAX), [createdDate] VARCHAR(MAX), [lastUpdatedDateTime] VARCHAR(MAX), [lastUpdatedBy] VARCHAR(MAX), [approval_status] VARCHAR(MAX), [approved_by] VARCHAR(MAX), [index] bigint, [column_changes] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 1_Text_1974659106943] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 2_Text_7556325638313] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 3_Text_1265532763677] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 4_Text_2597834633593] VARCHAR(MAX), [row_id] VARCHAR(MAX), [deletedBy] VARCHAR(MAX), [deletedOn] VARCHAR(MAX), [restored] VARCHAR(MAX), [modifiedRow_id] VARCHAR(MAX)) [result]
+            WHERE status = 'active'  AND approved_by = 'Suruthi S K' AND approval_status = 'approved' AND (
+                approval_status = 'approved'
+                 OR (
+                    approval_status = 'draft'
+                    AND CAST(createdBy AS VARCHAR) = ''
+                    AND (deletedBy IS NULL OR deletedBy = '')
+                )
+                OR (
+                    approval_status = 'draft'
+                    AND CAST(deletedBy AS VARCHAR)!= ''
+                    AND deletedBy IS NOT NULL
+                )
+                OR approval_status = 'submitted'
+            )
+            ORDER BY TRY_CAST(REPLACE(_id, '.', '') AS BIGINT)
+            OFFSET 0 ROWS
+            FETCH NEXT 10000 ROWS ONLY
+        ) AS sub
+		
+		
+		
+3) Row-Level Access Control in the Query		
+		
+		SELECT *
+        FROM (
+            SELECT *
+            FROM OPENROWSET(
+                BULK 'https://stgaccinmdhdevlrsf.dfs.core.windows.net/yasa/64ae50e5a4cd811344e380a2/yasaportal/6546c063dcbb137770ef938a/67bc5d80e85482ec211f5714_26-02-2025_07:11:03_AM.parquet',
+                FORMAT = 'PARQUET'
+            ) WITH ([_id] VARCHAR(MAX), [status] VARCHAR(MAX), [createdBy] VARCHAR(MAX), [createdDate] VARCHAR(MAX), [lastUpdatedDateTime] VARCHAR(MAX), [lastUpdatedBy] VARCHAR(MAX), [approval_status] VARCHAR(MAX), [approved_by] VARCHAR(MAX), [index] bigint, [column_changes] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 1_Text_1974659106943] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 2_Text_7556325638313] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 3_Text_1265532763677] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 4_Text_2597834633593] VARCHAR(MAX), [row_id] VARCHAR(MAX), [deletedBy] VARCHAR(MAX), [deletedOn] VARCHAR(MAX), [restored] VARCHAR(MAX), [modifiedRow_id] VARCHAR(MAX)) [result]
+            WHERE status = 'active'  AND approved_by = 'Suruthi S K' AND approval_status = 'approved' AND (
+                approval_status = 'approved'
+                 OR (
+                    approval_status = 'draft'
+                    AND CAST(createdBy AS VARCHAR) = '917647@narayanahealth.org'
+                    AND (deletedBy IS NULL OR deletedBy = '')
+                )
+                OR (
+                    approval_status = 'draft'
+                    AND CAST(deletedBy AS VARCHAR)!= '917647@narayanahealth.org'
+                    AND deletedBy IS NOT NULL
+                )
+                OR approval_status = 'submitted'
+            )
+            ORDER BY [6546c063dcbb137770ef938a_Column 4_Text_2597834633593] ASC
+            OFFSET 0 ROWS
+            FETCH NEXT 10000 ROWS ONLY
+        ) AS sub
+		
+		
+		
+4)Column level acess
+
+		SELECT _id, status, createdBy, createdDate, approval_status  -- Only allowed columns
+		FROM (
+			SELECT _id, status, createdBy, createdDate, approval_status, approved_by, lastUpdatedBy, column_changes, 
+				   [6546c063dcbb137770ef938a_Column 1_Text_1974659106943], 
+				   [6546c063dcbb137770ef938a_Column 2_Text_7556325638313], 
+				   [6546c063dcbb137770ef938a_Column 3_Text_1265532763677], 
+				   [6546c063dcbb137770ef938a_Column 4_Text_2597834633593]
+			FROM OPENROWSET(
+				BULK 'https://stgaccinmdhdevlrsf.dfs.core.windows.net/yasa/...parquet',
+				FORMAT = 'PARQUET'
+			) 
+			WITH (_id VARCHAR(MAX), status VARCHAR(MAX), createdBy VARCHAR(MAX), createdDate VARCHAR(MAX), 
+				  lastUpdatedDateTime VARCHAR(MAX), lastUpdatedBy VARCHAR(MAX), approval_status VARCHAR(MAX), 
+				  approved_by VARCHAR(MAX), index BIGINT, column_changes VARCHAR(MAX), 
+				  [6546c063dcbb137770ef938a_Column 1_Text_1974659106943] VARCHAR(MAX), 
+				  [6546c063dcbb137770ef938a_Column 2_Text_7556325638313] VARCHAR(MAX), 
+				  [6546c063dcbb137770ef938a_Column 3_Text_1265532763677] VARCHAR(MAX), 
+				  [6546c063dcbb137770ef938a_Column 4_Text_2597834633593] VARCHAR(MAX)
+			) [result]
+			WHERE status = 'active' 
+				AND approval_status = 'approved'
+				AND (
+					approval_status = 'approved'
+					OR (
+						approval_status = 'draft'
+						AND CAST(createdBy AS VARCHAR) = '917647@narayanahealth.org'
+						AND (deletedBy IS NULL OR deletedBy = '')
+					)
+					OR (
+						approval_status = 'draft'
+						AND CAST(deletedBy AS VARCHAR) != '917647@narayanahealth.org'
+						AND deletedBy IS NOT NULL
+					)
+					OR approval_status = 'submitted'
+				)
+			ORDER BY createdDate DESC
+			OFFSET 0 ROWS
+			FETCH NEXT 10000 ROWS ONLY
+		) AS sub;
+
+
+
+5)Column duplication
+
+		SELECT *
+			FROM (
+				SELECT *
+					FROM OPENROWSET(
+						BULK 'https://stgaccinmdhdevlrsf.dfs.core.windows.net/yasa/64ae50e5a4cd811344e380a2/yasaportal/6546c063dcbb137770ef938a/67bc5d80e85482ec211f5714_26-02-2025_09:57:14_AM.parquet',
+						FORMAT = 'PARQUET'
+					) WITH ([_id] VARCHAR(MAX), [status] VARCHAR(MAX), [createdBy] VARCHAR(MAX), [createdDate] VARCHAR(MAX), [lastUpdatedDateTime] VARCHAR(MAX), [lastUpdatedBy] VARCHAR(MAX), [approval_status] VARCHAR(MAX), [approved_by] VARCHAR(MAX), [index] bigint, [column_changes] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 1_Text_1974659106943] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 2_Text_7556325638313] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 3_Text_1265532763677] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 4_Text_2597834633593] VARCHAR(MAX), [row_id] VARCHAR(MAX), [deletedBy] VARCHAR(MAX), [deletedOn] VARCHAR(MAX), [restored] VARCHAR(MAX), [modifiedRow_id] int, [6546c063dcbb137770ef938a_Column 21_Text_4394222750162] VARCHAR(MAX)) [result]
+					WHERE status = 'active'  AND approved_by = 'Suruthi S K' AND approval_status = 'approved' AND (
+						approval_status = 'approved'
+						 OR (
+							approval_status = 'draft'
+							AND CAST(createdBy AS VARCHAR) = ''
+							AND (deletedBy IS NULL OR deletedBy = '')
+						)
+						OR (
+							approval_status = 'draft'
+							AND CAST(deletedBy AS VARCHAR)!= ''
+							AND deletedBy IS NOT NULL
+						)
+						OR approval_status = 'submitted'
+					)
+					ORDER BY TRY_CAST(REPLACE(_id, '.', '') AS BIGINT)
+					OFFSET 0 ROWS
+					FETCH NEXT 1000 ROWS ONLY
+				) AS sub
+				
+				
+				
+				
+6)project creation and name changing
+
+		SELECT *
+				FROM (
+					SELECT *
+					FROM OPENROWSET(
+						BULK 'https://stgaccinmdhdevlrsf.dfs.core.windows.net/yasa/64ae50e5a4cd811344e380a2/yasaportal/6546c063dcbb137770ef938a/67bc5d80e85482ec211f5714_26-02-2025_09:57:14_AM.parquet',
+						FORMAT = 'PARQUET'
+					) WITH ([_id] VARCHAR(MAX), [status] VARCHAR(MAX), [createdBy] VARCHAR(MAX), [createdDate] VARCHAR(MAX), [lastUpdatedDateTime] VARCHAR(MAX), [lastUpdatedBy] VARCHAR(MAX), [approval_status] VARCHAR(MAX), [approved_by] VARCHAR(MAX), [index] bigint, [column_changes] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 1_Text_1974659106943] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 2_Text_7556325638313] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 3_Text_1265532763677] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 4_Text_2597834633593] VARCHAR(MAX), [row_id] VARCHAR(MAX), [deletedBy] VARCHAR(MAX), [deletedOn] VARCHAR(MAX), [restored] VARCHAR(MAX), [modifiedRow_id] int, [6546c063dcbb137770ef938a_Column 21_Text_4394222750162] VARCHAR(MAX)) [result]
+					WHERE status = 'active'  AND approved_by = 'Suruthi S K' AND approval_status = 'approved' AND (
+						approval_status = 'approved'
+						 OR (
+							approval_status = 'draft'
+							AND CAST(createdBy AS VARCHAR) = ''
+							AND (deletedBy IS NULL OR deletedBy = '')
+						)
+						OR (
+							approval_status = 'draft'
+							AND CAST(deletedBy AS VARCHAR)!= ''
+							AND deletedBy IS NOT NULL
+						)
+						OR approval_status = 'submitted'
+					)
+					ORDER BY TRY_CAST(REPLACE(_id, '.', '') AS BIGINT)
+					OFFSET 0 ROWS
+					FETCH NEXT 10000 ROWS ONLY
+				) AS sub
+				
+	
+	
+7)delete columns
+
+	SELECT *
+			FROM (
+				SELECT *
+				FROM OPENROWSET(
+					BULK 'https://stgaccinmdhdevlrsf.dfs.core.windows.net/yasa/64ae50e5a4cd811344e380a2/yasaportal/6546c063dcbb137770ef938a/67bc5d80e85482ec211f5714_26-02-2025_09:57:14_AM.parquet',
+					FORMAT = 'PARQUET'
+				) WITH ([_id] VARCHAR(MAX), [status] VARCHAR(MAX), [createdBy] VARCHAR(MAX), [createdDate] VARCHAR(MAX), [lastUpdatedDateTime] VARCHAR(MAX), [lastUpdatedBy] VARCHAR(MAX), [approval_status] VARCHAR(MAX), [approved_by] VARCHAR(MAX), [index] bigint, [column_changes] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 1_Text_1974659106943] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 2_Text_7556325638313] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 3_Text_1265532763677] VARCHAR(MAX), [6546c063dcbb137770ef938a_Column 4_Text_2597834633593] VARCHAR(MAX), [row_id] VARCHAR(MAX), [deletedBy] VARCHAR(MAX), [deletedOn] VARCHAR(MAX), [restored] VARCHAR(MAX), [modifiedRow_id] int, [6546c063dcbb137770ef938a_Column 21_Text_4394222750162] VARCHAR(MAX)) [result]
+				WHERE status = 'active'  AND approved_by = 'Suruthi S K' AND approval_status = 'approved' AND (
+					approval_status = 'approved'
+					 OR (
+						approval_status = 'draft'
+						AND CAST(createdBy AS VARCHAR) = ''
+						AND (deletedBy IS NULL OR deletedBy = '')
+					)
+					OR (
+						approval_status = 'draft'
+						AND CAST(deletedBy AS VARCHAR)!= ''
+						AND deletedBy IS NOT NULL
+					)
+					OR approval_status = 'submitted'
+				)
+				ORDER BY TRY_CAST(REPLACE(_id, '.', '') AS BIGINT)
+				OFFSET 0 ROWS
+				FETCH NEXT 1000 ROWS ONLY
+			) AS sub
